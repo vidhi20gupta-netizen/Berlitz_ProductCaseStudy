@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Partner Pulse — A Berlitz case study</title>
+<style>
+  :root{
+    --ink:#1b1b1f; --ink-soft:#54545c; --paper:#faf8f4; --paper-2:#f0ede6;
+    --line:#e2ddd2; --accent:#a8471f; --accent-soft:#f4e2d4; --good:#2f6b4f; --bad:#a3372e;
+    --mono: 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6;}
+  .wrap{max-width:880px;margin:0 auto;padding:0 28px;}
+  .disclaimer{background:var(--ink);color:#fff;font-size:12.5px;text-align:center;padding:8px 16px;letter-spacing:.02em;}
+  .disclaimer b{font-weight:600;}
+
+  nav{position:sticky;top:0;z-index:50;background:rgba(250,248,244,.92);backdrop-filter:blur(6px);
+      border-bottom:1px solid var(--line);}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:960px;}
+  .brand{font-family:var(--serif);font-size:17px;font-weight:700;letter-spacing:.01em;}
+  .brand span{color:var(--accent);}
+  .navlinks{display:flex;gap:20px;font-size:13px;color:var(--ink-soft);flex-wrap:wrap;}
+  .navlinks a{color:inherit;text-decoration:none;}
+  .navlinks a:hover{color:var(--accent);}
+  .progress{height:2px;background:var(--accent);width:0%;position:fixed;top:0;left:0;z-index:60;transition:width .1s;}
+
+  header.hero{padding:88px 0 56px;max-width:960px;margin:0 auto;padding-left:28px;padding-right:28px;}
+  .eyebrow{font-size:12.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);font-weight:700;margin-bottom:18px;}
+  h1{font-family:var(--serif);font-size:42px;line-height:1.16;margin:0 0 20px;max-width:720px;}
+  .lede{font-size:18px;color:var(--ink-soft);max-width:640px;margin:0 0 32px;}
+  .byline{display:flex;gap:14px;align-items:center;font-size:13.5px;color:var(--ink-soft);flex-wrap:wrap;}
+  .byline .dot{width:5px;height:5px;border-radius:50%;background:var(--ink-soft);}
+
+  .statrow{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
+            border:1px solid var(--line);margin-top:44px;border-radius:10px;overflow:hidden;}
+  .stat{background:var(--paper);padding:20px 18px;}
+  .stat .n{font-family:var(--serif);font-size:26px;color:var(--accent);}
+  .stat .l{font-size:12px;color:var(--ink-soft);margin-top:4px;}
+
+  section{max-width:960px;margin:0 auto;padding:64px 28px;}
+  section.tight{padding-top:0;}
+  h2{font-family:var(--serif);font-size:28px;margin:0 0 8px;}
+  .kicker{font-size:12.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:700;margin-bottom:10px;}
+  p{font-size:16px;color:var(--ink-soft);max-width:680px;}
+  p.lead{font-size:17.5px;color:var(--ink);}
+
+  .callout{background:var(--paper-2);border-left:3px solid var(--accent);padding:18px 22px;border-radius:6px;
+            font-size:15px;color:var(--ink);max-width:680px;margin:22px 0;}
+  .callout b{color:var(--accent);}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:28px;}
+  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:22px;}
+  .card h3{margin:0 0 8px;font-size:15px;}
+  .card p{font-size:14px;margin:0;}
+  .card .tag{display:inline-block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+             background:var(--accent-soft);color:var(--accent);padding:3px 9px;border-radius:20px;margin-bottom:10px;font-weight:700;}
+
+  .messy{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px;font-family:var(--mono);
+         font-size:12px;color:#8a8578;position:relative;overflow:hidden;}
+  .messy .row{display:flex;gap:8px;padding:5px 0;border-bottom:1px dashed #e6e1d5;align-items:center;flex-wrap:wrap;}
+  .messy .flag{color:var(--bad);font-weight:700;}
+  .messy .src{color:var(--ink-soft);font-weight:700;min-width:78px;}
+
+  /* options comparison */
+  .options{margin-top:30px;display:flex;flex-direction:column;gap:14px;}
+  .option{border:1px solid var(--line);border-radius:10px;background:#fff;padding:20px 22px;}
+  .option .row1{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+  .option h3{margin:0;font-size:16px;}
+  .option .verdict{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px;border-radius:20px;white-space:nowrap;}
+  .verdict.no{background:#fbe9e6;color:var(--bad);}
+  .verdict.slow{background:#fdf1d8;color:#8a5a12;}
+  .verdict.yes{background:#e4f0e9;color:var(--good);}
+  .option .detail{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px;}
+  .option .detail div{font-size:13.5px;}
+  .option .detail b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);margin-bottom:3px;}
+
+  .demo{margin-top:30px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;
+        box-shadow:0 12px 32px -18px rgba(27,27,31,.25);}
+  .demo-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);
+             background:var(--paper-2);flex-wrap:wrap;gap:10px;}
+  .demo-title{font-size:13px;font-weight:700;color:var(--ink-soft);}
+  .toggle{display:flex;background:#fff;border:1px solid var(--line);border-radius:20px;padding:3px;}
+  .toggle button{border:0;background:transparent;font-size:12.5px;font-weight:600;padding:6px 14px;border-radius:16px;
+                  cursor:pointer;color:var(--ink-soft);font-family:inherit;}
+  .toggle button.active{background:var(--ink);color:#fff;}
+  .demo-body{padding:20px;min-height:300px;}
+
+  .state{display:none;}
+  .state.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+  .sources-view{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+  .src-chip{font-size:11.5px;background:var(--paper-2);border:1px solid var(--line);padding:5px 10px;border-radius:6px;color:var(--ink-soft);}
+
+  table.recon{width:100%;border-collapse:collapse;font-size:13px;}
+  table.recon th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);
+                  border-bottom:1px solid var(--line);padding:6px 8px;}
+  table.recon td{padding:9px 8px;border-bottom:1px solid #f0ede6;}
+  .badge{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;}
+  .badge.ok{background:#e4f0e9;color:var(--good);}
+  .badge.warn{background:#fbe9e6;color:var(--bad);}
+
+  .flow{margin-top:34px;}
+  .flow svg{width:100%;height:auto;display:block;}
+  .flow-caption{font-size:12.5px;color:var(--ink-soft);text-align:center;margin-top:10px;}
+
+  .phases{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:28px;}
+  .phase{border:1px solid var(--line);border-radius:10px;padding:20px;background:#fff;}
+  .phase .num{font-family:var(--serif);font-size:22px;color:var(--accent);}
+  .phase h4{margin:6px 0 10px;font-size:14.5px;}
+  .phase ul{margin:0;padding-left:18px;font-size:13.5px;color:var(--ink-soft);}
+  .phase li{margin-bottom:6px;}
+
+  .why-me{display:flex;gap:20px;margin-top:24px;}
+  .why-list{display:flex;flex-direction:column;gap:26px;}
+  .why-item .co{font-weight:700;font-size:13px;color:var(--accent);}
+  .why-item p{margin:4px 0 0;font-size:14.5px;}
+
+  .risk-list{display:flex;flex-direction:column;gap:14px;margin-top:24px;}
+  .risk{display:flex;gap:14px;border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:#fff;}
+  .risk .r-icon{font-size:13px;color:var(--accent);font-weight:700;min-width:22px;}
+  .risk p{margin:0;font-size:14px;}
+  .risk b{color:var(--ink);}
+
+  footer{max-width:960px;margin:0 auto;padding:60px 28px 90px;border-top:1px solid var(--line);}
+  footer p{font-size:13px;}
+  .fade-in{opacity:0;transform:translateY(14px);transition:opacity .5s ease, transform .5s ease;}
+  .fade-in.in{opacity:1;transform:none;}
+
+  @media (max-width:720px){
+    h1{font-size:30px;}
+    .statrow{grid-template-columns:repeat(2,1fr);}
+    .grid2{grid-template-columns:1fr;}
+    .phases{grid-template-columns:1fr;}
+    .why-me{flex-direction:column;}
+    .option .detail{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="disclaimer">This is an independent case study for Berlitz's Senior Product Manager role to practically showcase my Product Sense and its application in the real world<b>— not an official Berlitz product </b>, built from publicly available data.</div>
+<div class="progress" id="progress"></div>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">Partner <span>Pulse</span></div>
+    <div class="navlinks">
+      <a href="#problem">Problem</a>
+      <a href="#options">Options</a>
+      <a href="#solution">Idea</a>
+      <a href="#demo">Demo</a>
+      <a href="#impact">Impact</a>
+      <a href="#plan">Plan</a>
+      <a href="#why-me">Why me</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="eyebrow">Berlitz · Senior Product Manager · Product Case Study</div>
+  <h1>Partners trust Berlitz. Berlitz should be able to trust the numbers coming back.</h1>
+  <p class="lede">A look at one problem hiding inside a 150-year-old, 375-center network, why reaching for smart matching isn't automatically the right call, and what I'd actually build once I'd ruled out the simpler options.</p>
+  <div class="byline">
+    <span>Vidhi Gupta</span><div class="dot"></div>
+    <span>Senior Product Manager candidate</span><div class="dot"></div>
+    <span>Aug 2026</span>
+  </div>
+
+  <div class="statrow">
+    <div class="stat"><div class="n">375+</div><div class="l">learning centers worldwide</div></div>
+    <div class="stat"><div class="n">76</div><div class="l">countries served</div></div>
+    <div class="stat"><div class="n">Mixed</div><div class="l">company-owned + partner-run centers</div></div>
+    <div class="stat"><div class="n">0</div><div class="l">public sign of it being used internally, only for learners so far</div></div>
+  </div>
+</header>
+
+<section id="problem">
+  <div class="kicker">01 — The problem</div>
+  <h2>Every center keeps its own books, its own way</h2>
+  <p class="lead">Berlitz runs about 375 language centers in 76 countries. Some are owned by Berlitz directly, many are run by local partners. That's been true, in one form or another, for close to 150 years — it's just what happens when a company grows this big over this much time.</p>
+  <p>On its own, that's not a problem. The problem is what happens between centers. One partner's billing number doesn't match head office's copy. A compliance certificate is current in the local tracker but missing from head office's master list. A customer complaint gets handled at the center and never shows up anywhere else. None of these is a disaster by itself. Nobody notices any of them until a partner disputes an invoice, or an audit turns up a gap that's been sitting there for months.</p>
+
+  <div class="callout">Everything in this case study is built from what's public about Berlitz, not real internal data — I'm modeling the problem, not claiming to know it. Where I use a number, I say plainly whether it's real or a guess.</div>
+
+  <div class="messy" aria-hidden="true">
+    <div class="row"><span class="src">Center · DE</span> Q2 bill sent to HQ: €18,240 <span class="flag">off by 0.5%</span></div>
+    <div class="row"><span class="src">Center · JP</span> compliance renewal only logged locally, not at HQ</div>
+    <div class="row"><span class="src">Center · BR</span> Q2 bill sent to HQ: R$61,900 <span class="flag">no matching HQ record</span></div>
+    <div class="row"><span class="src">Center · FR</span> new lead logged in local system only, never synced</div>
+    <div class="row"><span class="src">Center · AE</span> customer complaint closed locally, no record at HQ</div>
+    <div class="row"><span class="src">Center · IN</span> Q2 bill sent to HQ: ₹4.1L <span class="flag">currency not specified</span></div>
+    <div class="row"><span class="src">Center · ES</span> compliance certificate expired 40 days ago, unflagged</div>
+  </div>
+  <p style="font-size:12.5px;margin-top:8px;">A made-up example to show the shape of the problem — not real Berlitz records.</p>
+</section>
+
+<section id="options" class="tight">
+  <div class="kicker">02 — Picking the right fix, not the trendy one</div>
+  <h2>Smart matching was one option on the list. It wasn't the first one I reached for.</h2>
+  <p class="lead">Before landing on anything, I laid out four ways to close this gap, roughly from simplest to most involved, and was honest with myself about what each one does and doesn't solve.</p>
+
+  <div class="options">
+    <div class="option">
+      <div class="row1">
+        <h3>1. Ask every center to use the same spreadsheet</h3>
+        <span class="verdict no">Too weak</span>
+      </div>
+      <div class="detail">
+        <div><b>Fixes</b>Everyone's numbers look the same shape.</div>
+        <div><b>Doesn't fix</b>Someone still has to spot a mismatch by eye, center by center.</div>
+      </div>
+    </div>
+    <div class="option">
+      <div class="row1">
+        <h3>2. Move every center onto one shared system</h3>
+        <span class="verdict slow">Right goal, wrong first step</span>
+      </div>
+      <div class="detail">
+        <div><b>Fixes</b>One place for everything, eventually.</div>
+        <div><b>Doesn't fix</b>Rolling this out to 375 centers in 76 countries takes years, and it helps no one until nearly everyone has switched.</div>
+      </div>
+    </div>
+    <div class="option">
+      <div class="row1">
+        <h3>3. Simple rules — flag anything more than a set amount off</h3>
+        <span class="verdict slow">Part of the answer</span>
+      </div>
+      <div class="detail">
+        <div><b>Fixes</b>Catches the obvious stuff, no smart matching needed, cheap to build.</div>
+        <div><b>Doesn't fix</b>Struggles the moment the mismatch isn't a number out of range — it's a currency mix-up, a renamed field, or a typo a rule wasn't written for.</div>
+      </div>
+    </div>
+    <div class="option">
+      <div class="row1">
+        <h3>4. Smart matching that reads the data as it actually shows up, and flags what looks off</h3>
+        <span class="verdict yes">Worth adding, narrowly</span>
+      </div>
+      <div class="detail">
+        <div><b>Fixes</b>Works with the messy formats centers already send, without waiting for anyone to change how they work.</div>
+        <div><b>Doesn't fix</b>Needs a person to make the final call, and needs close watching early on so it doesn't flag the wrong things.</div>
+      </div>
+    </div>
+  </div>
+
+  <p style="margin-top:24px;">My honest answer is a mix of options 3 and 4: simple rules for the obvious cases, a light layer of smart matching for the messy ones a fixed rule can't anticipate. Not smart matching because it's fashionable — smart matching because option 2 is too slow to help anyone this year, and the data will stay messy for a long time no matter what system Berlitz eventually standardizes on.</p>
+</section>
+
+<section id="solution">
+  <div class="kicker">03 — The idea</div>
+  <h2>Partner Pulse: one place to see what doesn't add up, before it becomes a dispute</h2>
+  <p class="lead">Not a new system for centers to learn. It sits quietly underneath the systems they already use, checks what comes in, and only bothers a person with the handful of things that actually need a decision.</p>
+
+  <div class="flow">
+    <svg viewBox="0 0 860 220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#a8471f"/>
+        </marker>
+      </defs>
+      <g font-family="-apple-system,Segoe UI,sans-serif" font-size="12" fill="#54545c">
+        <rect x="10" y="20" width="140" height="46" rx="8" fill="#fff" stroke="#e2ddd2"/>
+        <text x="80" y="48" text-anchor="middle" fill="#1b1b1f" font-weight="600">Billing files</text>
+        <rect x="10" y="86" width="140" height="46" rx="8" fill="#fff" stroke="#e2ddd2"/>
+        <text x="80" y="114" text-anchor="middle" fill="#1b1b1f" font-weight="600">Compliance records</text>
+        <rect x="10" y="152" width="140" height="46" rx="8" fill="#fff" stroke="#e2ddd2"/>
+        <text x="80" y="180" text-anchor="middle" fill="#1b1b1f" font-weight="600">Leads + support notes</text>
+      </g>
+      <path d="M150,43 C220,43 220,110 300,110" stroke="#a8471f" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      <path d="M150,109 L300,109" stroke="#a8471f" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      <path d="M150,175 C220,175 220,110 300,110" stroke="#a8471f" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      <rect x="305" y="70" width="180" height="80" rx="10" fill="#a8471f"/>
+      <text x="395" y="102" text-anchor="middle" fill="#fff" font-weight="700" font-size="13" font-family="-apple-system,Segoe UI,sans-serif">Check for mismatches</text>
+      <text x="395" y="122" text-anchor="middle" fill="#f4e2d4" font-size="11" font-family="-apple-system,Segoe UI,sans-serif">rules first, smart matching for the rest</text>
+      <path d="M485,110 L560,110" stroke="#a8471f" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      <rect x="565" y="55" width="150" height="46" rx="8" fill="#fff" stroke="#e2ddd2"/>
+      <text x="640" y="83" text-anchor="middle" fill="#1b1b1f" font-weight="600" font-size="12" font-family="-apple-system,Segoe UI,sans-serif">One dashboard</text>
+      <rect x="565" y="121" width="150" height="46" rx="8" fill="#fff" stroke="#e2ddd2"/>
+      <text x="640" y="149" text-anchor="middle" fill="#1b1b1f" font-weight="600" font-size="12" font-family="-apple-system,Segoe UI,sans-serif">A heads-up to the partner</text>
+      <path d="M715,88 L790,110" stroke="#a8471f" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      <path d="M715,144 L790,110" stroke="#a8471f" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      <circle cx="815" cy="110" r="26" fill="#f4e2d4"/>
+      <text x="815" y="107" text-anchor="middle" font-size="10" fill="#a8471f" font-weight="700" font-family="-apple-system,Segoe UI,sans-serif">A person</text>
+      <text x="815" y="119" text-anchor="middle" font-size="10" fill="#a8471f" font-weight="700" font-family="-apple-system,Segoe UI,sans-serif">decides</text>
+    </svg>
+    <div class="flow-caption">It never approves or resolves anything by itself — it just narrows 375 centers' worth of noise down to the few things a person actually needs to look at.</div>
+  </div>
+</section>
+
+<section id="demo" class="tight">
+  <div class="kicker">04 — See it, don't just read about it</div>
+  <h2>Same numbers, two ways of checking them</h2>
+  <p>Flip between how a billing review probably works today and how it would work with Partner Pulse. Every figure below is made up, to show the shape of the idea, not real Berlitz numbers.</p>
+
+  <div class="demo">
+    <div class="demo-head">
+      <div class="demo-title">Q2 partner billing review — 6 sample centers</div>
+      <div class="toggle">
+        <button id="btn-before" class="active" onclick="showState('before')">Today (by hand)</button>
+        <button id="btn-after" onclick="showState('after')">With Partner Pulse</button>
+      </div>
+    </div>
+    <div class="demo-body">
+
+      <div id="state-before" class="state active">
+        <div class="sources-view">
+          <span class="src-chip">📁 billing_DE_q2.xlsx</span>
+          <span class="src-chip">📁 billing_BR_q2_FINAL_v3.xlsx</span>
+          <span class="src-chip">📁 billing_IN_q2.csv</span>
+          <span class="src-chip">📧 3 emails about currency conversion</span>
+          <span class="src-chip">📄 1 scanned partner invoice</span>
+        </div>
+        <p style="font-size:13.5px;">Someone opens five files in five formats, converts currencies by hand, checks them against what they remember from last quarter, and emails two centers to ask which number is actually current. A mismatch usually only comes to light once a partner disputes it.</p>
+      </div>
+
+      <div id="state-after" class="state">
+        <table class="recon">
+          <tr><th>Center</th><th>Reported</th><th>Converted to €</th><th>Status</th></tr>
+          <tr><td>Germany</td><td>€18,240</td><td>€18,240</td><td><span class="badge ok">Matches</span></td></tr>
+          <tr><td>Brazil</td><td>R$61,900</td><td>€10,980</td><td><span class="badge warn">4.2% below forecast</span></td></tr>
+          <tr><td>India</td><td>₹4.1L</td><td>€4,410</td><td><span class="badge warn">Currency wasn't labeled</span></td></tr>
+          <tr><td>France</td><td>€22,110</td><td>€22,110</td><td><span class="badge ok">Matches</span></td></tr>
+          <tr><td>UAE</td><td>AED 71,200</td><td>€17,650</td><td><span class="badge ok">Matches</span></td></tr>
+          <tr><td>Spain</td><td>€15,760</td><td>€15,760</td><td><span class="badge warn">Compliance doc expired</span></td></tr>
+        </table>
+        <p style="font-size:13.5px;margin-top:14px;">Everything gets converted to one currency and checked the moment it comes in. The person reviewing it opens one screen and spends their morning on the three flagged rows, instead of re-doing all six from scratch.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="impact">
+  <div class="kicker">05 — Why this is worth a quarter of engineering time</div>
+  <h2>A small, quiet fix with a big blast radius</h2>
+  <p class="lead">This isn't a flashy new feature. It's worth doing because small mismatches add up silently across 375 centers, and right now nobody has one place to see them all.</p>
+  <div class="grid2">
+    <div class="card">
+      <div class="tag">A guess, not a measurement</div>
+      <h3>Time saved</h3>
+      <p>Checking numbers by hand across a network this size usually eats several days of someone's time every billing cycle <i>(a general benchmark, not a Berlitz-specific figure)</i>. Most of that time goes into the matching itself, which is exactly the boring part software is good at.</p>
+    </div>
+    <div class="card">
+      <div class="tag">A guess, not a measurement</div>
+      <h3>Fewer disputes</h3>
+      <p>Catching a mismatch before a partner notices it turns an awkward conversation into a quick correction <i>(a reasonable assumption — the real size of this would need Berlitz's actual dispute numbers)</i>.</p>
+    </div>
+  </div>
+  <p style="margin-top:22px;">I don't have Berlitz's real numbers, and I wouldn't pretend to. What I do know: this exact problem — pulling messy, multi-source records into one view people can trust — is one I've solved before, at a smaller but similarly shaped scale.</p>
+</section>
+
+<section id="plan" class="tight">
+  <div class="kicker">06 — How I'd actually ship it</div>
+  <h2>90 days, not a full platform rebuild</h2>
+  <div class="phases">
+    <div class="phase">
+      <div class="num">01</div>
+      <h4>Weeks 1–3 · Check the assumption</h4>
+      <ul>
+        <li>Sit with the team doing this reconciliation by hand today and watch how they actually do it</li>
+        <li>Pull real billing files from 2–3 markets to see what actually goes wrong, not what I assume goes wrong</li>
+        <li>Prototype the matching logic against real sample data before writing a single spec</li>
+      </ul>
+    </div>
+    <div class="phase">
+      <div class="num">02</div>
+      <h4>Weeks 4–9 · Build small, on purpose</h4>
+      <ul>
+        <li>One screen, 3–5 pilot markets, billing only — nothing else yet</li>
+        <li>It flags, it never resolves — a person always makes the call</li>
+        <li>Ship to the team who'd actually use it every day, not a demo audience</li>
+      </ul>
+    </div>
+    <div class="phase">
+      <div class="num">03</div>
+      <h4>Weeks 10–13 · Grow it or drop it</h4>
+      <ul>
+        <li>If time saved or disputes caught genuinely improves, extend to compliance and more markets</li>
+        <li>If it doesn't move the needle, the cost was three weeks and five markets, not a platform rebuild</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="why-me">
+  <div class="kicker">07 — Why I'd build it this way</div>
+  <h2>I've done the unglamorous version of this twice already</h2>
+  <div class="why-me">
+    <div class="why-list">
+      <div class="why-item">
+        <div class="co">Coinhaven — fintech trading platform</div>
+        <p>As the first product hire, I built the admin, risk, and dispute tools from nothing, including a system that set what each user was allowed to do based on identity checks — and an integration that cut ID verification time from 6 days to under 2.</p>
+      </div>
+      <div class="why-item">
+        <div class="co">Soulspiti — a network of independent suppliers</div>
+        <p>Replaced manual, founder-run coordination across a two-sided supplier network with one system of record. That alone cut the operations workload by 95% and let the partner network grow from 9 to 30 without adding headcount.</p>
+      </div>
+    </div>
+  </div>
+  <p style="margin-top:26px;">Both were smaller than Berlitz's network. Both were the same shape of problem: scattered, manual, multi-party data that needed one trustworthy view before anyone could act on it with confidence.</p>
+</section>
+
+<section id="risks" class="tight">
+  <div class="kicker">08 — Where I could be wrong</div>
+  <h2>Honest risks, not a highlight reel</h2>
+  <div class="risk-list">
+    <div class="risk"><div class="r-icon">01</div><p><b>I'm looking at this from outside.</b> Everything above comes from what's public about Berlitz, not its real systems. The actual fix might be smaller, bigger, or already underway — the first three weeks exist to find that out before any code gets written.</p></div>
+    <div class="risk"><div class="r-icon">02</div><p><b>Partners might see this as being watched, not helped.</b> If centers read this as surveillance instead of support, they won't use it, no matter how good the underlying logic is — this is as much a trust problem as a product one.</p></div>
+    <div class="risk"><div class="r-icon">03</div><p><b>The matching won't be right at first, and shouldn't be trusted blindly.</b> Currency formats, date conventions, and local terms vary enough across 76 countries that early accuracy will be rough. That's exactly why nothing gets resolved without a person checking it.</p></div>
+    <div class="risk"><div class="r-icon">04</div><p><b>It would be easy to over-build this.</b> The tempting version adds smart matching everywhere and auto-fixes things on its own. The version I'd actually ship stays narrow on purpose — flag, don't decide — because a quiet tool people trust beats a clever one they stop checking.</p></div>
+  </div>
+</section>
+
+<footer>
+  <p>This is a way of showing how I think through an ambiguous, high-stakes problem from the outside — not a claim to know Berlitz's real systems or numbers. Happy to go deeper on any part of it.</p>
+  <p><b>Vidhi Gupta</b> — <a href="https://mango-resonance-3bc.notion.site/Hi-I-am-Vidhi-Senior-Product-Manager-ba4c86e8297083f6810381d5aa727bb7" style="color:var(--accent);">Portfolio</a> · <a href="https://linkedin.com/in/vidhii7/" style="color:var(--accent);">LinkedIn</a></p>
+</footer>
+
+<script>
+  function showState(which){
+    document.getElementById('state-before').classList.toggle('active', which==='before');
+    document.getElementById('state-after').classList.toggle('active', which==='after');
+    document.getElementById('btn-before').classList.toggle('active', which==='before');
+    document.getElementById('btn-after').classList.toggle('active', which==='after');
+  }
+  window.addEventListener('scroll', function(){
+    var h = document.documentElement;
+    var pct = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    document.getElementById('progress').style.width = pct + '%';
+  });
+  var els = document.querySelectorAll('section, header');
+  els.forEach(function(el){ el.classList.add('fade-in'); });
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); } });
+  }, {threshold:0.08});
+  els.forEach(function(el){ io.observe(el); });
+</script>
+
+</body>
+</html>
